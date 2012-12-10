@@ -191,6 +191,7 @@ Feature: Sequences Activities
           - default_data_set
         :sequence:
           :type: "NumericSequence"
+          :dataSet: default_data_set
           :title: Enter a number
           :initialPrompt: What is the value at x=2?
           :correctAnswer: 200
