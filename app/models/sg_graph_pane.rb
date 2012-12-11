@@ -30,6 +30,26 @@ module SgGraphPane
     self.add_marshall_callback(callback)
   end
 
+  def included_data_sets_from_hash(definitions)
+    callback = Proc.new do
+      self.reload
+      definitions.each do |definition|
+        found_data_set = self.page.activity.data_sets.find_by_name(definition['name'])
+        self.data_sets << found_data_set
+      end
+      self.save!
+    end
+    self.add_marshall_callback(callback)
+  end
+
+  def include_referenced_graphs(graph_reference_urls)
+    graphs = self.sg_activity.extract_graphs
+    graphs.select! { |g| (g.respond_to? :get_indexed_path) && (graph_reference_urls.include?(g.get_indexed_path))}
+    graphs.each do |graph|
+      self.included_graphs << graph
+    end
+  end
+
   def to_hash
     hash = {
       'type'   => self.graph_type,
@@ -46,6 +66,15 @@ module SgGraphPane
     if included_graphs.size > 0
       hash['includeAnnotationsFrom'] = included_graphs.map{|graph| graph.get_indexed_path }
     end
+    if data_sets.size > 0
+      hash['includedDataSets'] = included_datasets
+    end
     hash
+  end
+
+  def included_datasets
+    # TODO: Eventually we want to be able to specify if datasets are
+    # in the legend.
+    return data_sets.map {|d| {"name" => d.name, "inLegend" => true} }
   end
 end

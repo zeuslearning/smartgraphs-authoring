@@ -27,7 +27,7 @@ describe SensorGraphPane do
 
     describe "#to_hash" do
       let(:expected_hash) { 
-        {"type"=>"SensorGraphPane", "title"=>"x in terms of y", "yLabel"=>"y", "yMin"=>0.0, "yMax"=>1.0, "xLabel"=>"x", "xMin"=>0.0, "xMax"=>10.0, "yTicks"=>0.1, "xTicks"=>1.0}
+        {"type"=>"SensorGraphPane", "title"=>"x in terms of y", "yLabel"=>"y", "yMin"=>0.0, "yMax"=>1.0, "xLabel"=>"x", "xMin"=>0.0, "xMax"=>10.0, "yTicks"=>0.1, "xTicks"=>1.0, "includedDataSets"=> [] }
       }  
       it "should match our expected hash" do
         subject.to_hash.should == expected_hash
@@ -48,4 +48,15 @@ describe SensorGraphPane do
     end
   end
 
+  describe "included datasets" do
+    before(:each) do
+      @data_set = mock_model(DataSet, :name => "dataset_a")
+      @test_subject = subject
+      @test_subject.stub(:included_graphs => [@data_set])
+    end
+
+    it "matches our expected hash" do
+      @test_subject.to_hash.should include({"includedDataSets"=>[{"name"=>"dataset_a","inLegend"=>false}]})
+    end
+  end
 end
